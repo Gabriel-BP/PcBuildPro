@@ -54,7 +54,6 @@ export function BuildSummary({
     return acc;
   }, 0);
 
-  // Helper function to format component prices in euros
   const getComponentPrice = (component: Component, quantity: number) => {
     if (component?.Precios.Nuevos?.Precio.valor) {
       const priceInEuros = convertToEuros(
@@ -66,23 +65,10 @@ export function BuildSummary({
     return "-";
   };
 
-  const handleValidate = async () => {
-    navigate("/validation");
+  const handleValidate = () => {
     const componentesNombres = Object.values(selectedComponents).map(c => c?.Nombre).filter(Boolean);
-    console.log("Componentes seleccionados para validar:", componentesNombres);
-
-    try {
-      const response = await fetch('http://localhost:3000/api/validate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ componentes: componentesNombres })
-      });
-
-      const data = await response.json();
-      console.log("Resultado validación Neo4j:", data.result);
-    } catch (error) {
-      console.error("❌ Error llamando a /api/validate:", error);
-    }
+    localStorage.setItem('componentesSeleccionados', JSON.stringify(componentesNombres));
+    navigate("/validation");
   };
 
   return (

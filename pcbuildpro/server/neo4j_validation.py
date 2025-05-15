@@ -1,6 +1,10 @@
 from neo4j import GraphDatabase
 import re
 import sys
+import io
+
+# Forzar stdout a UTF-8 incluso en Windows
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 NEO4J_URI = "bolt://localhost:7687"
 NEO4J_USER = "neo4j"

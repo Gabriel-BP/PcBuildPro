@@ -40,7 +40,7 @@ export default function Filters() {
     const newFilters = {
       ...defaultFilters,
       processorBrand,
-      socket,
+      socket: socket,
       gpuBrand,
       motherboardSize
     };
