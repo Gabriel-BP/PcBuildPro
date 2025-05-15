@@ -11,45 +11,36 @@ import { X } from "lucide-react";
 import { FilterPanel } from "@/components/filters/FilterPanel";
 
 export default function Builder() {
-  const [selectedCategory, setSelectedCategory] = useState<ComponentCategory | null>(
-    null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<ComponentCategory | null>(null);
   const [componentFilters, setComponentFilters] = useState<Record<string, any>>({});
-  
+
   const { filters, selectedComponents, setSelectedComponents } = useFilters();
 
   useEffect(() => {
     if (selectedCategory) {
       const newFilters: Record<string, any> = {};
-      
+
       if (selectedCategory === "cpu") {
-        if (filters.processorBrand) {
-          newFilters.processorBrand = filters.processorBrand;
-        }
         if (filters.socket) {
-          newFilters.socket = filters.socket;
+          newFilters.enchufe = filters.socket;
         }
-      } 
-      else if (selectedCategory === "gpu") {
+      } else if (selectedCategory === "gpu") {
         if (filters.gpuBrand) {
           newFilters.gpuBrand = filters.gpuBrand;
         }
-      }
-      else if (selectedCategory === "motherboard") {
+      } else if (selectedCategory === "motherboard") {
         if (filters.motherboardSize) {
           newFilters.factor_de_forma = filters.motherboardSize;
         }
         if (filters.socket) {
-          newFilters.socket = filters.socket;
+          newFilters.enchufe = filters.socket;
         }
       }
-      
+
       console.log(`Applying global filters for ${selectedCategory}:`, newFilters);
       setComponentFilters(newFilters);
     }
   }, [selectedCategory, filters]);
-
-  console.log('Current filters in Builder page:', filters);
 
   const handleSelectComponent = (component: Component) => {
     setSelectedComponents((prev) => ({
@@ -87,7 +78,7 @@ export default function Builder() {
     <div className="min-h-screen bg-transparent relative overflow-hidden">
       <InteractiveBackground />
       <Toaster />
-      
+
       <header className="relative z-10 border-b border-white/10 bg-black/20 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold text-white">Configurador de PC</h1>
@@ -101,12 +92,12 @@ export default function Builder() {
               selectedCategory={selectedCategory}
               onSelectCategory={handleCategorySelect}
             />
-            
+
             {selectedCategory && (
               <div className="animate-fade-in relative">
-                <Button 
+                <Button
                   variant="ghost"
-                  size="icon" 
+                  size="icon"
                   className="absolute -top-2 -right-2 h-8 w-8 rounded-full bg-gray-800/80 hover:bg-gray-700"
                   onClick={() => setSelectedCategory(null)}
                 >
@@ -125,14 +116,13 @@ export default function Builder() {
               selectedComponents={selectedComponents}
               onRemoveComponent={handleRemoveComponent}
             />
-            
+
             {selectedCategory && (
               <div className="animate-fade-in">
-                <h2 className="text-xl font-semibold text-white mb-3">Filtros de {getCategoryDisplayName(selectedCategory)}</h2>
-                <FilterPanel 
-                  category={selectedCategory}
-                  onFilterChange={handleFilterChange}
-                />
+                <h2 className="text-xl font-semibold text-white mb-3">
+                  Filtros de {getCategoryDisplayName(selectedCategory)}
+                </h2>
+                <FilterPanel category={selectedCategory} onFilterChange={handleFilterChange} />
               </div>
             )}
           </div>
@@ -147,7 +137,9 @@ function sanitizeFilters(filters: Record<string, any>) {
 
   Object.entries(filters).forEach(([key, value]) => {
     if (Array.isArray(value)) {
-      if (value[0] !== value[1]) {
+      if (value[0] === value[1]) {
+        sanitized[key] = value[0];
+      } else {
         sanitized[key] = value;
       }
     } else if (typeof value === 'boolean') {
@@ -157,20 +149,23 @@ function sanitizeFilters(filters: Record<string, any>) {
     }
   });
 
+  // Eliminar processorBrand en todos los casos (se maneja con enchufe)
+  delete sanitized.processorBrand;
+
   return sanitized;
 }
 
 function getCategoryDisplayName(category: ComponentCategory): string {
   const categoryNames: Record<ComponentCategory, string> = {
-    "case": "Gabinete",
-    "cpu": "Procesador",
-    "gpu": "Tarjeta Gráfica",
-    "motherboard": "Placa Base",
+    case: "Gabinete",
+    cpu: "Procesador",
+    gpu: "Tarjeta Gráfica",
+    motherboard: "Placa Base",
     "power-supply": "Fuente de Alimentación",
-    "memory": "Memoria RAM",
-    "storage": "Almacenamiento",
-    "cooler": "Refrigeración"
+    memory: "Memoria RAM",
+    storage: "Almacenamiento",
+    cooler: "Refrigeración",
   };
-  
+
   return categoryNames[category] || category;
 }

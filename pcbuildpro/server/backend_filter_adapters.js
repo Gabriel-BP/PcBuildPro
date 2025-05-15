@@ -1,5 +1,18 @@
 // backend_filter_adapters.js
 
+function convertRangeToRegexMatch(field, range) {
+    if (!Array.isArray(range)) return {};
+    if (range[0] === range[1]) {
+        return { [field]: { $regex: `^${range[0]}`, $options: 'i' } };
+    } else {
+        const options = [];
+        for (let i = range[0]; i <= range[1]; i++) {
+            options.push({ [field]: { $regex: `^${i}`, $options: 'i' } });
+        }
+        return { $or: options };
+    }
+}
+
 function buildProcessorFilters(query) {
     const filters = {};
     if (query.processorBrand) {
@@ -9,13 +22,13 @@ function buildProcessorFilters(query) {
         filters["Características.Enchufe"] = { $regex: query.enchufe, $options: 'i' };
     }
     if (query.nucleos) {
-        filters["Características.Núcleos"] = { $gte: query.nucleos[0], $lte: query.nucleos[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Núcleos", query.nucleos));
     }
     if (query.tdp) {
-        filters["Características.TDP"] = { $gte: `${query.tdp[0]} W`, $lte: `${query.tdp[1]} W` };
+        Object.assign(filters, convertRangeToRegexMatch("Características.TDP", query.tdp));
     }
     if (query.reloj_base) {
-        filters["Características.Reloj base"] = { $gte: `${query.reloj_base[0]} GHz`, $lte: `${query.reloj_base[1]} GHz` };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Reloj base", query.reloj_base));
     }
     return filters;
 }
@@ -26,13 +39,13 @@ function buildGPUFilters(query) {
         filters["Marca"] = { $regex: query.gpuBrand, $options: 'i' };
     }
     if (query.memoria) {
-        filters["Características.Memoria"] = { $gte: query.memoria[0], $lte: query.memoria[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Memoria", query.memoria));
     }
     if (query.tdp) {
-        filters["Características.TDP"] = { $gte: query.tdp[0], $lte: query.tdp[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.TDP", query.tdp));
     }
     if (query.longitud) {
-        filters["Características.Longitud"] = { $gte: query.longitud[0], $lte: query.longitud[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Longitud", query.longitud));
     }
     if (query.tipo_de_memoria) {
         filters["Características.Tipo de memoria"] = { $regex: query.tipo_de_memoria, $options: 'i' };
@@ -49,10 +62,10 @@ function buildMotherboardFilters(query) {
         filters["Características.Factor de forma"] = { $regex: query.motherboardSize, $options: 'i' };
     }
     if (query.ranuras_de_ram) {
-        filters["Características.Ranuras de RAM"] = { $gte: query.ranuras_de_ram[0], $lte: query.ranuras_de_ram[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Ranuras de RAM", query.ranuras_de_ram));
     }
     if (query.ranuras_m2) {
-        filters["Características.Ranuras M.2"] = { $gte: query.ranuras_m2[0], $lte: query.ranuras_m2[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Ranuras M.2", query.ranuras_m2));
     }
     if (query.tipo_de_memoria) {
         filters["Características.Tipo de memoria"] = { $regex: query.tipo_de_memoria, $options: 'i' };
@@ -72,10 +85,10 @@ function buildMotherboardFilters(query) {
 function buildMemoryFilters(query) {
     const filters = {};
     if (query.velocidad) {
-        filters["Características.Velocidad"] = { $gte: query.velocidad[0], $lte: query.velocidad[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Velocidad", query.velocidad));
     }
     if (query.latencia_cas) {
-        filters["Características.Latencia CAS"] = { $gte: query.latencia_cas[0], $lte: query.latencia_cas[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Latencia CAS", query.latencia_cas));
     }
     if (query.tipo_de_memoria) {
         filters["Características.Tipo de memoria"] = { $regex: query.tipo_de_memoria, $options: 'i' };
@@ -95,7 +108,7 @@ function buildStorageFilters(query) {
         filters["Características.Tipo de almacenamiento"] = { $regex: query.tipo_de_almacenamiento, $options: 'i' };
     }
     if (query.capacidad) {
-        filters["Características.Capacidad"] = { $regex: query.capacidad, $options: 'i' };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Capacidad", query.capacidad));
     }
     if (query.interfaz) {
         filters["Características.Interfaz"] = { $regex: query.interfaz, $options: 'i' };
@@ -112,7 +125,7 @@ function buildStorageFilters(query) {
 function buildPSUFilters(query) {
     const filters = {};
     if (query.potencia) {
-        filters["Características.Potencia"] = { $gte: query.potencia[0], $lte: query.potencia[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Potencia", query.potencia));
     }
     if (query.calificacion_de_eficiencia) {
         filters["Características.Calificación de eficiencia"] = { $regex: query.calificacion_de_eficiencia, $options: 'i' };
@@ -124,7 +137,7 @@ function buildPSUFilters(query) {
         filters["Características.Factor de forma"] = { $regex: query.factor_de_forma, $options: 'i' };
     }
     if (query.longitud) {
-        filters["Características.Longitud"] = { $gte: query.longitud[0], $lte: query.longitud[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Longitud", query.longitud));
     }
     return filters;
 }
@@ -132,7 +145,7 @@ function buildPSUFilters(query) {
 function buildCaseFilters(query) {
     const filters = {};
     if (query.longitud_maxima_de_gpu) {
-        filters["Características.Longitud máxima de GPU"] = { $gte: query.longitud_maxima_de_gpu[0], $lte: query.longitud_maxima_de_gpu[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Longitud máxima de GPU", query.longitud_maxima_de_gpu));
     }
     if (query.factores_de_forma) {
         filters["Características.Factores de forma"] = { $regex: query.factores_de_forma, $options: 'i' };
@@ -146,10 +159,10 @@ function buildCaseFilters(query) {
 function buildCoolerFilters(query) {
     const filters = {};
     if (query.ruido_maximo) {
-        filters["Características.Ruido máximo"] = { $gte: query.ruido_maximo[0], $lte: query.ruido_maximo[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Ruido máximo", query.ruido_maximo));
     }
     if (query.rpm_maximas) {
-        filters["Características.RPM máximas"] = { $gte: query.rpm_maximas[0], $lte: query.rpm_maximas[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.RPM máximas", query.rpm_maximas));
     }
     if (query.refrigerado_por_agua) {
         filters["Características.Refrigerado por agua"] = query.refrigerado_por_agua === 'true' ? { $regex: /si|sí|yes|true/i } : { $regex: /no|false/i };
@@ -158,7 +171,7 @@ function buildCoolerFilters(query) {
         filters["Características.Sin ventilador"] = query.sin_ventilador === 'true' ? { $regex: /si|sí|yes|true/i } : { $regex: /no|false/i };
     }
     if (query.longitud_del_radiador) {
-        filters["Características.Longitud del radiador"] = { $gte: query.longitud_del_radiador[0], $lte: query.longitud_del_radiador[1] };
+        Object.assign(filters, convertRangeToRegexMatch("Características.Longitud del radiador", query.longitud_del_radiador));
     }
     return filters;
 }
