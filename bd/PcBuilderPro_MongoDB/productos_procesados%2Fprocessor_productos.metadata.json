@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"33999543c44948d2a40dd4196a90807a","collectionName":"productos_procesados/processor_productos","type":"collection"}

@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"a492a3c4ac4d442da1a74729cf78eee3","collectionName":"productos_procesados/cooler_productos","type":"collection"}
